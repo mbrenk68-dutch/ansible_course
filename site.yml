@@ -16,6 +16,28 @@
         update_cache: true
       when: ansible_facts['distribution'] == "Ubuntu"
 
+
+    - name: create a user
+      tags: always
+      ansible.builtin.user:
+        name: jari
+        groups: root
+
+    - name: add sudoers file for jari
+      tags: always 
+      ansible.builtin.copy:
+        src: sudoer_jari
+        dest: /etc/sudoers.d/jari
+        owner: root
+        group: root
+        mode: 0440
+        
+    - name: add ssh key for jari
+      tags: always
+      ansible.builtin.authorized_key:
+        user: jari
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBeQqXvD/TfJf5TRuy/U+1P/idBwGEhfO4HMY7f74Y/A marco@ubu26svrws"
+
 - hosts: web_servers
   become: true
   tasks:
@@ -62,7 +84,7 @@
         name: httpd
         state: restarted
       when: httpd.changed
-       
+      
     - name: copy html file for site
       tags: apache,ubbuntu
       ansible.builtin.copy:
