@@ -1,11 +1,9 @@
 - name: install apache on webservers
-  tags: apache
   ansible.builtin.package:
-    name:
-      - "{{ apache_package }}"
- 
+    name: "{{ apache_package }}"
+    state: present
+
 - name: ensure package is running
-  tags: apache
   ansible.builtin.service:
     name: "{{ apache_service }}"
     state: started
@@ -18,4 +16,3 @@
     line: ServerAdmin marcovanbrenk@pm.me
   when: ansible_facts['distribution'] == "Fedora"
   notify: restart_apache
-

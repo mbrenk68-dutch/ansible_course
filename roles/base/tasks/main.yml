@@ -1,20 +1,41 @@
-    - name: create a user
-      tags: always
-      ansible.builtin.user:
-        name: jari
-        groups: root
+- name: Create a user
+  ansible.builtin.user:
+    name: jari
+    groups: root
+  tags: always
 
-    - name: add sudoers file for jari
-      tags: always
-      ansible.builtin.copy:
-        src: sudoer_jari
-        dest: /etc/sudoers.d/jari
-        owner: root
-        group: root
-        mode: 0440
+- name: Add sudoers file for jari
+  ansible.builtin.copy:
+    src: sudoer_jari
+    dest: /etc/sudoers.d/jari
+    owner: root
+    group: root
+    mode: '0440'
+  tags: always
 
-    - name: add ssh key for jari
-      tags: always
-      ansible.builtin.authorized_key:
-        user: jari
-        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBeQqXvD/TfJf5TRuy/U+1P/idBwGEhfO4HMY7f74Y/A marco@ubu26svrws"
+- name: Add ssh key for jari
+  ansible.builtin.authorized_key:
+    user: jari
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBeQqXvD/TfJf5TRuy/U+1P/idBwGEhfO4HMY7f74Y/A marco@ubu26svrws" 
+  tags: always
+
+
+#- name: configure openssh based on a template
+#  ansible.builtin.template:
+#    src: "{{ ssh_template_file }}"
+#    dest: /etc/ssh/sshd_config
+#    owner: root
+#    group: root
+#    mode: 0644
+#  notify: restart_sshd
+
+- name: configure openssh based on a template
+  ansible.builtin.template:
+    src: "{{ ssh_template_file }}"
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644' # Tip: zet rechten altijd tussen aanhalingstekens om octale conversiefouten te voorkomen
+    validate: /usr/sbin/sshd -t -f %s # <--- DIT REDT JE LEVEN IN DE TOEKOMST!
+  notify: restart_sshd
+
